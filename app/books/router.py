@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from datetime import datetime
 import csv, json
+from sqlalchemy.orm import selectinload
+from app.books.models import Book
 
 from app.users.dependencies import get_current_user
 from app.books.schemas import BookCreate, BookRead
 from app.books.dao import BooksDAO, AuthorsDAO
+from app.books.exceptions import BookAlreadyExistsException, FileParseException
 from app.users.models import User
-from app.books.models import Book
 
 router = APIRouter(prefix="/books", tags=["Books"])
 
@@ -25,7 +26,7 @@ async def create_book(book: BookCreate, user: User = Depends(get_current_user)):
         )
         return await BooksDAO.find_one_or_none_by_id(new_book.id, options=[selectinload(Book.author)])
     except IntegrityError:
-        raise HTTPException(status_code=400, detail="Book already exists.")
+        raise BookAlreadyExistsException
 
 
 @router.get("/", response_model=List[BookRead])
@@ -55,6 +56,8 @@ async def get_books(
 
 @router.get("/{book_id}", response_model=BookRead)
 async def get_book_by_id(book_id: int):
+    from sqlalchemy.orm import selectinload
+    from app.books.models import Book
     book = await BooksDAO.find_one_or_none_by_id(book_id, options=[selectinload(Book.author)])
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -63,6 +66,9 @@ async def get_book_by_id(book_id: int):
 
 @router.put("/{book_id}", response_model=BookRead)
 async def update_book(book_id: int, book: BookCreate, user: User = Depends(get_current_user)):
+    from sqlalchemy.orm import selectinload
+    from app.books.models import Book
+
     author = await AuthorsDAO.get_or_create(book.author_name)
     updated = await BooksDAO.update(
         {"id": book_id},
@@ -87,7 +93,11 @@ async def delete_book(book_id: int, user: User = Depends(get_current_user)):
 @router.post("/import")
 async def import_books(file: UploadFile = File(...), user: User = Depends(get_current_user)):
     from app.books.utils import parse_books_file
-    books_data = await parse_books_file(file)
+
+    try:
+        books_data = await parse_books_file(file)
+    except Exception as e:
+        raise FileParseException
 
     added_books = []
     for data in books_data:
