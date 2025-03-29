@@ -16,10 +16,12 @@ class BaseDAO:
             return result.scalars().all()
 
     @classmethod
-    async def find_one_or_none_by_id(cls, data_id: int):
+    async def find_one_or_none_by_id(cls, data_id: int, *, options: list = None):
         async with async_session_maker() as session:
-            query = select(cls.model).filter_by(id=data_id)
-            result = await session.execute(query)
+            stmt = select(cls.model).filter_by(id=data_id)
+            if options:
+                stmt = stmt.options(*options)
+            result = await session.execute(stmt)
             return result.scalar_one_or_none()
 
     @classmethod
