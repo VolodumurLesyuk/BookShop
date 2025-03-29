@@ -8,8 +8,9 @@ class AuthorRead(BaseModel):
     id: int
     name: str
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class BookBase(BaseModel):
     title: str = Field(..., min_length=1)
@@ -40,5 +41,6 @@ class BookRead(BaseModel):
     published_year: int
     author: AuthorRead
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }

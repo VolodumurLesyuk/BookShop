@@ -14,7 +14,7 @@ from app.users.models import User
 
 router = APIRouter(prefix="/books", tags=["Books"])
 
-@router.post("/", response_model=BookRead)
+@router.post("/", response_model=BookRead, status_code=201)
 async def create_book(book: BookCreate, user: User = Depends(get_current_user)):
     author = await AuthorsDAO.get_or_create(book.author_name)
     try:
@@ -64,7 +64,7 @@ async def get_book_by_id(book_id: int):
     return book
 
 
-@router.put("/{book_id}", response_model=BookRead)
+@router.put("/{book_id}", response_model=BookRead, status_code=200)
 async def update_book(book_id: int, book: BookCreate, user: User = Depends(get_current_user)):
     from sqlalchemy.orm import selectinload
     from app.books.models import Book
@@ -82,7 +82,7 @@ async def update_book(book_id: int, book: BookCreate, user: User = Depends(get_c
     return await BooksDAO.find_one_or_none_by_id(book_id, options=[selectinload(Book.author)])
 
 
-@router.delete("/{book_id}")
+@router.delete("/{book_id}", status_code=204)
 async def delete_book(book_id: int, user: User = Depends(get_current_user)):
     deleted = await BooksDAO.delete(id=book_id)
     if not deleted:

@@ -13,7 +13,7 @@ from app.users.schemas import SUserRegister, SUserAuth, SUserRole
 router = APIRouter(prefix='/auth', tags=['Auth'])
 
 
-@router.post("/register/")
+@router.post("/register/", status_code=201)
 async def register_user(user_data: SUserRegister) -> dict:
     user = await UsersDAO.find_one_or_none(email=user_data.email)
     if user:
@@ -44,7 +44,7 @@ async def auth_user(response: Response, user_data: SUserAuth):
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
 
-@router.post("/refresh")
+@router.post("/refresh", )
 async def refresh_tokens(request: Request, response: Response):
     refresh_token = request.cookies.get('users_refresh_token')
     if not refresh_token:

@@ -12,5 +12,7 @@ async def parse_books_file(file: UploadFile):
             return [row for row in reader]
         else:
             raise HTTPException(status_code=400, detail="Unsupported file format")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"File parsing error: {str(e)}")
