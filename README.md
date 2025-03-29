@@ -39,6 +39,13 @@ SECRET_KEY=gV64m9aIzFG4qpgVphvQbPQrtAO0nM-7YwwOvu0XPt5KJOjAy4AfgLkqJXYEt
 ALGORITHM=HS256
 ```
 
+## 🗄️ База даних
+Створення та міграція
+```
+alembic revision --autogenerate -m "init"
+alembic upgrade head
+```
+
 ## 🚀 Запуск сервера
 ```
 uvicorn app.main:app --reload
