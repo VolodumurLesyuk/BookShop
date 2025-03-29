@@ -1,0 +1,8 @@
+python-jose
+bcrypt==4.0.1
+passlib[bcrypt]
+fastapi[all]
+requests
+alembic==1.15.1
+asyncpg==0.30.0
+sqlalchemy==2.0.39
