@@ -9,7 +9,7 @@ from app.books.models import Book
 from app.users.dependencies import get_current_user
 from app.books.schemas import BookCreate, BookRead
 from app.books.dao import BooksDAO, AuthorsDAO
-from app.books.exceptions import BookAlreadyExistsException, FileParseException
+from app.books.exceptions import BookAlreadyExistsException, FileParseException, InvalidYearRangeException
 from app.users.models import User
 
 router = APIRouter(prefix="/books", tags=["Books"])
@@ -41,6 +41,8 @@ async def get_books(
     skip: int = 0,
     limit: int = 10
 ):
+    if year_from is not None and year_to is not None and year_from > year_to:
+        raise InvalidYearRangeException
     return await BooksDAO.get_filtered_books(
         title=title,
         author=author,
