@@ -13,3 +13,10 @@ class FileParseException(HTTPException):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Не вдалося розпарсити файл. Перевірте формат або дані."
         )
+
+class InvalidYearRangeException(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="year_from не може бути більшим за year_to."
+        )
