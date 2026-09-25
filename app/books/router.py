@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from app.books.models import Book
 
 from app.users.dependencies import get_current_user
-from app.books.schemas import BookCreate, BookRead
+from app.books.schemas import BookCreate, BookRead, GENRES
 from app.books.dao import BooksDAO, AuthorsDAO
 from app.books.exceptions import BookAlreadyExistsException, FileParseException
 from app.users.models import User
@@ -52,6 +52,11 @@ async def get_books(
         skip=skip,
         limit=limit
     )
+
+
+@router.get("/genres", response_model=List[str])
+async def get_genres():
+    return GENRES
 
 
 @router.get("/{book_id}", response_model=BookRead)
