@@ -34,3 +34,9 @@ async def test_update_book(authorized_client):
 async def test_delete_book(authorized_client):
     response = await authorized_client.delete("/books/1")
     assert response.status_code in [204, 404]
+
+@pytest.mark.asyncio
+async def test_get_genres(async_client):
+    response = await async_client.get("/books/genres")
+    assert response.status_code == 200
+    assert response.json() == ["Fiction", "Non-Fiction", "Science", "History"]
